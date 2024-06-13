@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Controllers\Players;
 use App\Controllers\TeamIndex;
+use App\Controllers\PlayerIndex;
 use App\Controllers\Teams;
+use App\Middleware\GetPlayer;
 use App\Middleware\GetTeam;
 use Slim\Factory\AppFactory;
 use DI\ContainerBuilder;
@@ -45,19 +48,28 @@ $app->add(new AddJsonResponseHeader);
 $app->group('/api', function (RouteCollectorProxy $group) {
 
     //Get all teams registered
-    $group->get('/teams', TeamIndex::class);
+    $group->get('/equipos', TeamIndex::class);
     //Add a new team 
-    $group->post('/teams', [Teams::class, 'create']);
+    $group->post('/equipos', [Teams::class, 'create']);
     //get, update and delete team by id
     $group->group('', function (RouteCollectorProxy $group) {
 
-        $group->get('/teams/{id:[0-9]+}', Teams::class . ':show');
+        $group->get('/equipos/{id:[0-9]+}', Teams::class . ':show');
 
-        $group->patch('/teams/{id:[0-9]+}', Teams::class . ':update');
+        $group->patch('/equipos/{id:[0-9]+}', Teams::class . ':update');
 
-        $group->delete('/teams/{id:[0-9]+}', Teams::class . ':delete');
+        $group->delete('/equipos/{id:[0-9]+}', Teams::class . ':delete');
 
     })->add(GetTeam::class);
+
+
+    $group->get('/jugadores', PlayerIndex::class);
+    $group->post('/jugadores', [Players::class, 'create']);
+    $group->group('', function (RouteCollectorProxy $group) {
+
+        $group->get('/jugadores/{id:[0-9]+}', Players::class . ':show');
+
+    })->add(GetPlayer::class);
 
 });
 
